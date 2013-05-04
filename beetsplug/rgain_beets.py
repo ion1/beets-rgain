@@ -1,3 +1,5 @@
+# coding=utf-8
+
 # beets-rgain – A replay gain plugin for Beets
 #
 # Copyright © 2013 Johan Kiviniemi <devel@johan.kiviniemi.name>
