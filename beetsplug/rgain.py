@@ -55,7 +55,7 @@ class RGainPlugin(BeetsPlugin):
 
         self.update_items(lib, [item], tracks_rg)
 
-    def calculate_items(self, items):
+    def calculate_items(self, items, kluge_retries=2):
         paths = [ syspath(item.path) for item in items ]
 
         req = {
@@ -64,19 +64,28 @@ class RGainPlugin(BeetsPlugin):
             'paths':   paths,
         }
 
-        cmd = ["beets_rgain_helper"]
+        cmd = "beets_rgain_helper"
         p = subprocess.Popen(cmd,
                              stdin=subprocess.PIPE,
-                             stdout=subprocess.PIPE)
+                             stdout=subprocess.PIPE,
+                             stderr=subprocess.PIPE)
 
         yaml.dump(req, p.stdin)
-        p.stdin.close()
+        (out, err) = p.communicate("")
 
-        res = yaml.load(p.stdout)
+        if p.returncode != 0 or err != "":
+            # D-:
+            if kluge_retries > 0 and \
+               "Fatal Python error: GC object already tracked" in err:
+                log.warn("rgain: %s: %s, retrying" % (repr(cmd), repr(err)))
+                log.warn("https://bitbucket.org/fk/rgain/issue/4/crash-fatal-python-error-gc-object-already")
+                return self.calculate_items(items,
+                                            kluge_retries=kluge_retries-1)
+            else:
+                raise subprocess.CalledProcessError(returncode=ret, cmd=cmd,
+                                                    output=out+err)
 
-        ret = p.wait()
-        if ret != 0:
-            raise subprocess.CalledProcessError(returncode=ret, cmd=cmd)
+        res = yaml.load(out)
 
         return (res['tracks'], res['album'])
 
