@@ -21,6 +21,17 @@ from rgain import rgcalc
 import sys
 import yaml
 
+# Seriously no map for dict in the standard library?
+def map_dict(f, d):
+    return { k: f(v) for k, v in d.iteritems() }
+
+def unpack_gaindata(rg):
+    return {
+        'gain':      rg.gain,
+        'peak':      rg.peak,
+        'ref_level': rg.ref_level,
+    }
+
 def main():
     req = yaml.load(sys.stdin)
 
@@ -32,8 +43,8 @@ def main():
         rgcalc.calculate(paths, force=force, ref_lvl=ref_lvl)
 
     res = {
-        'tracks': tracks_rg,
-        'album':  album_rg,
+        'tracks': map_dict(unpack_gaindata, tracks_rg),
+        'album':  unpack_gaindata(album_rg),
     }
 
     yaml.dump(res, sys.stdout)

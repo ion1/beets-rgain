@@ -81,20 +81,20 @@ class RGainPlugin(BeetsPlugin):
         return (res['tracks'], res['album'])
 
     def update_album(self, lib, album, rg):
-        album.rg_album_gain = rg.gain
-        album.rg_album_peak = rg.peak
+        album.rg_album_gain = rg['gain']
+        album.rg_album_peak = rg['peak']
 
         log.debug(u'rgain: album %d: gain=%.2f peak=%.8f' %
-                  (album.id, rg.gain, rg.peak))
+                  (album.id, rg['gain'], rg['peak']))
 
     def update_items(self, lib, items, rg_dict):
         for item in items:
             rg = rg_dict[syspath(item.path)]
 
-            item.rg_track_gain = rg.gain
-            item.rg_track_peak = rg.peak
+            item.rg_track_gain = rg['gain']
+            item.rg_track_peak = rg['peak']
 
             lib.store(item)
 
             log.debug(u'rgain: item %d %s: gain=%.2f peak=%.8f' %
-                      (item.id, displayable_path(item.path), rg.gain, rg.peak))
+                      (item.id, displayable_path(item.path), rg['gain'], rg['peak']))
