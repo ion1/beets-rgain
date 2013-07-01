@@ -19,7 +19,8 @@
 from beets.plugins import BeetsPlugin
 from beets.util import displayable_path, syspath
 import logging
-from rgain.rgcalc import calculate
+import subprocess
+import yaml
 
 log = logging.getLogger('beets')
 
@@ -56,7 +57,28 @@ class RGainPlugin(BeetsPlugin):
 
     def calculate_items(self, items):
         paths = [ syspath(item.path) for item in items ]
-        return calculate(paths, force=FORCE, ref_lvl=REF_LVL)
+
+        req = {
+            'force':   FORCE,
+            'ref_lvl': REF_LVL,
+            'paths':   paths,
+        }
+
+        cmd = ["beets_rgain_helper"]
+        p = subprocess.Popen(cmd,
+                             stdin=subprocess.PIPE,
+                             stdout=subprocess.PIPE)
+
+        yaml.dump(req, p.stdin)
+        p.stdin.close()
+
+        res = yaml.load(p.stdout)
+
+        ret = p.wait()
+        if ret != 0:
+            raise subprocess.CalledProcessError(returncode=ret, cmd=cmd)
+
+        return (res['tracks'], res['album'])
 
     def update_album(self, lib, album, rg):
         album.rg_album_gain = rg.gain
