@@ -41,12 +41,12 @@ def main():
 
     req = yaml.load(sys.stdin)
 
-    paths   = req['paths']
-    force   = req['force']
-    ref_lvl = req['ref_lvl']
+    paths     = req['paths']
+    force     = req['force']
+    ref_level = req['ref_level']
 
     (tracks_rg, album_rg) = \
-        rgcalc.calculate(paths, force=force, ref_lvl=ref_lvl)
+        rgcalc.calculate(paths, force=force, ref_lvl=ref_level)
 
     res = {
         'tracks': map_dict(unpack_gaindata, tracks_rg),

@@ -25,8 +25,8 @@ import yaml
 log = logging.getLogger('beets')
 
 # TODO: Make these configurable.
-FORCE   = True
-REF_LVL = 89
+FORCE     = True
+REF_LEVEL = 89
 
 class RGainPlugin(BeetsPlugin):
     def __init__(self):
@@ -59,9 +59,9 @@ class RGainPlugin(BeetsPlugin):
         paths = [ syspath(item.path) for item in items ]
 
         req = {
-            'force':   FORCE,
-            'ref_lvl': REF_LVL,
-            'paths':   paths,
+            'force':     FORCE,
+            'ref_level': REF_LEVEL,
+            'paths':     paths,
         }
 
         cmd = ["beets_rgain_helper"]
