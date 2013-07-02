@@ -21,6 +21,9 @@ from rgain import rgcalc
 import sys
 import yaml
 
+# XXX: Crash fix for rgain ≤ 1.0.2, https://bitbucket.org/fk/rgain/issue/4
+import gobject
+
 # Seriously no map for dict in the standard library?
 def map_dict(f, d):
     return { k: f(v) for k, v in d.iteritems() }
@@ -33,6 +36,9 @@ def unpack_gaindata(rg):
     }
 
 def main():
+    # XXX: Crash fix for rgain ≤ 1.0.2, https://bitbucket.org/fk/rgain/issue/4
+    gobject.threads_init()
+
     req = yaml.load(sys.stdin)
 
     paths   = req['paths']
